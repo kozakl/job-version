@@ -1,0 +1,9 @@
+# Compiled
+*.pyc
+
+# Environments
+venv/
+
+# Others
+.idea/
+TODO.txt
