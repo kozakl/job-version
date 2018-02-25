@@ -1,5 +1,6 @@
 import shotgun_api3
 import json
+import time
 import glob
 from pprint import pprint
 import os
@@ -10,15 +11,19 @@ sg = shotgun_api3.Shotgun('https://juicewro.shotgunstudio.com',
 
 
 def main():
-    update()
+    while True:
+        update()
+        time.sleep(15)
 
 
 def update():
+    print('Update')
+
     jobs = filter(os.path.isfile, glob.glob('S:/jobs/*'))
     for job in jobs:
         data = json.load(open(job, 'r'))
         version = create_version(data)
-        upload_version(version)
+        print upload_version(version)
 
 
 def create_version(data):
@@ -31,13 +36,13 @@ def create_version(data):
         },
         'user': {'type': 'HumanUser', 'id': 87},
         'updated_by': {'type': 'HumanUser', 'id': 87},
-        'sg_path_to_movie': '../Test.mp4',
+        'sg_path_to_movie': 'W:/0000_sg_development/render/Draft/shotgun_h264.mov',
     }
     return sg.create('Version', datax)
 
 
 def upload_version(version):
-    sg.upload('Version', version['id'], '../Test.mp4', 'sg_uploaded_movie')
+    sg.upload('Version', version['id'], 'W:/0000_sg_development/render/Draft/shotgun_h264.mov', 'sg_uploaded_movie')
 
 
 if __name__ == "__main__":
