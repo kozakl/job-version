@@ -14,7 +14,7 @@ def main():
 
 
 def update():
-    jobs = filter(os.path.isfile, glob.glob('/home/luke/Dropbox/S/*'))
+    jobs = filter(os.path.isfile, glob.glob('S:/jobs/*'))
     for job in jobs:
         data = json.load(open(job, 'r'))
         version = create_version(data)
