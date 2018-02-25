@@ -4,6 +4,7 @@ import time
 import glob
 from pprint import pprint
 import os
+import sys
 
 sg = shotgun_api3.Shotgun('https://juicewro.shotgunstudio.com',
                           'job-version-daemon',
@@ -46,4 +47,5 @@ def upload_version(version):
 
 
 if __name__ == "__main__":
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     main()
