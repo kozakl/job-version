@@ -6,6 +6,8 @@ from pprint import pprint
 import os
 import sys
 import os.path
+from datetime import datetime
+import logging
 
 sg = shotgun_api3.Shotgun('https://juicewro.shotgunstudio.com',
                           'job-version-daemon',
@@ -13,12 +15,24 @@ sg = shotgun_api3.Shotgun('https://juicewro.shotgunstudio.com',
 
 
 def main():
+    logging.basicConfig(
+        filename='S:/log/job-version.log',
+        format='%(asctime)s %(levelname)-7s %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S',
+        level=logging.DEBUG
+    )
+
+    update()
+    return
     while True:
         update()
         time.sleep(15)
 
 
 def update():
+    logging.debug('Update')
+
+    print(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ': ', 'update')
     jobs = filter(os.path.isfile, glob.glob('S:/jobs/*'))
     for job in jobs:
         data = json.load(open(job, 'r'))
