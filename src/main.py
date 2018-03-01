@@ -13,8 +13,6 @@ sg = shotgun_api3.Shotgun('https://juicewro.shotgunstudio.com',
 
 
 def main():
-    update()
-    return
     while True:
         update()
         time.sleep(15)
@@ -25,9 +23,12 @@ def update():
     for job in jobs:
         data = json.load(open(job, 'r'))
         if os.path.isfile(data['movie']):
-            version = create_version(data)
-            upload_version(version)
-        #print( data['projectId'] )
+            try:
+                version = create_version(data)
+                upload_version(version)
+                os.remove(job)
+            except Exception as exception:
+                print(exception)
 
 
 def create_version(job_data):
