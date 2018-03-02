@@ -2,64 +2,75 @@ import shotgun_api3
 import json
 import time
 import glob
-from pprint import pprint
 import os
 import sys
 import os.path
 from datetime import datetime
 import logging
+from watchdog.observers import Observer
+from events import JobEventHandler
+from os.path import basename
+from utils import ShotgunUtil
 
-sg = shotgun_api3.Shotgun('https://juicewro.shotgunstudio.com',
-                          'job-version-daemon',
-                          '3819096b36111394a58a2d7280059e1951eafcaba663b53ba2fe546cd3cab6f7')
+shotgun = shotgun_api3.Shotgun('https://juicewro.shotgunstudio.com',
+                               'job-version-daemon',
+                               '3819096b36111394a58a2d7280059e1951eafcaba663b53ba2fe546cd3cab6f7')
+jobs_count = 10
 
 
 def main():
     logging.basicConfig(
         filename='S:/log/job-version.log',
-        format='%(asctime)s %(levelname)-7s %(message)s',
+        format='%(asctime)s %(levelname)-6s %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S',
         level=logging.DEBUG
     )
 
-    update()
-    return
-    while True:
-        update()
-        time.sleep(15)
+    job_event_handler = JobEventHandler()
+    job_event_handler.on_created = on_created_job
+    observer = Observer()
+    observer.schedule(job_event_handler, 'S:/jobs')
+    observer.start()
+
+    try:
+        while True:
+            time.sleep(1)
+            check_jobs()
+    except KeyboardInterrupt:
+        observer.stop()
+
+    #update()
+    #return
+    #while True:
+    #    update()
+    #    time.sleep(15)
 
 
-def update():
-    logging.debug('Update')
+def on_created_job(event):
+    global jobs_count
+    jobs_count += 1
+    logging.info('Job %s - created' + str(jobs_count), basename(event.src_path))
+    check_jobs()
 
-    print(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ': ', 'update')
+
+def check_jobs():
     jobs = filter(os.path.isfile, glob.glob('S:/jobs/*'))
     for job in jobs:
         data = json.load(open(job, 'r'))
         if os.path.isfile(data['movie']):
             try:
-                version = create_version(data)
-                upload_version(version)
+                logging.info('Job %s - movie exist', basename(job))
+
+                version = ShotgunUtil.create_version(shotgun, data)
+                logging.info('Job %s - version %s created', basename(job), version['id'])
+
+                entity = ShotgunUtil.upload_version(shotgun, version)
+                logging.info('Job %s - entity %s uploaded', basename(job), entity)
+
                 os.remove(job)
+                logging.info('Job %s - removed', basename(job))
             except Exception as exception:
                 print(exception)
-
-
-def create_version(job_data):
-    sg.config.sudo_as_login = job_data['userName']
-    data = {
-        'code': os.path.basename(job_data['movie']),
-        'project': {
-            'type': 'Project',
-            'id': job_data['projectId']
-        },
-        'sg_path_to_movie': job_data['movie'],
-    }
-    return sg.create('Version', data)
-
-
-def upload_version(version):
-    sg.upload('Version', version['id'], version['sg_path_to_movie'], 'sg_uploaded_movie')
 
 
 if __name__ == "__main__":
