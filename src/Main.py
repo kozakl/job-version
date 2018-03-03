@@ -1,15 +1,15 @@
-import shotgun_api3
 import json
-import time
-import glob
-import os
+import logging
 import shutil
 import sys
-import os.path
-import logging
+import os
+import time
+import shotgun_api3
+
+from glob import glob
+from os import path
 from watchdog.observers import Observer
 from events import JobEventHandler
-from os.path import basename
 from utils import ShotgunUtil
 
 
@@ -19,7 +19,7 @@ class Main:
         self.shotgun = shotgun_api3.Shotgun('https://juicewro.shotgunstudio.com',
                                             'job-version-daemon',
                                             '3819096b36111394a58a2d7280059e1951eafcaba663b53ba2fe546cd3cab6f7')
-        self.total_jobs = len(filter(os.path.isfile, glob.glob('S:/jobs/*')))
+        self.total_jobs = len(filter(path.isfile, glob('S:/jobs/*')))
 
         logging.basicConfig(
             filename='S:/log/job-version.log',
@@ -44,39 +44,39 @@ class Main:
             observer.stop()
 
     def on_created_job(self, event):
-        self.total_jobs = len(filter(os.path.isfile, glob.glob('S:/jobs/*')))
-        logging.info('Job %s - created, total jobs %s', basename(event.src_path), str(self.total_jobs))
+        self.total_jobs = len(filter(path.isfile, glob('S:/jobs/*')))
+        logging.info('Job %s - created, total jobs %s', path.basename(event.src_path), str(self.total_jobs))
 
     def on_deleted_job(self, event):
-        self.total_jobs = len(filter(os.path.isfile, glob.glob('S:/jobs/*')))
-        logging.info('Job %s - removed, total jobs %s', basename(event.src_path), str(self.total_jobs))
+        self.total_jobs = len(filter(path.isfile, glob('S:/jobs/*')))
+        logging.info('Job %s - removed, total jobs %s', path.basename(event.src_path), str(self.total_jobs))
 
     def check_jobs(self):
-        jobs = filter(os.path.isfile, glob.glob('S:/jobs/*'))
+        jobs = filter(os.path.isfile, glob('S:/jobs/*'))
         for job in jobs:
             data = json.load(open(job, 'r'))
             if os.path.isfile(data['movie']):
                 try:
-                    logging.info('Job %s - movie exist', basename(job))
+                    logging.info('Job %s - movie exist', path.basename(job))
 
                     version = ShotgunUtil.create_version(self.shotgun, data)
-                    logging.info('Job %s - version %s created', basename(job), version['id'])
+                    logging.info('Job %s - version %s created', path.basename(job), version['id'])
 
                     entity = ShotgunUtil.upload_version(self.shotgun, version)
-                    logging.info('Job %s - entity %s uploaded', basename(job), entity)
+                    logging.info('Job %s - entity %s uploaded', path.basename(job), entity)
 
                     self.move_to_log(job)
-                    logging.info('Job %s - move to logs', basename(job))
+                    logging.info('Job %s - move to logs', path.basename(job))
                 except Exception as exception:
                     print(exception)
 
     @staticmethod
     def move_to_log(job):
-        if not os.path.exists('S:/log/jobs'):
+        if not path.exists('S:/log/jobs'):
             os.makedirs('S:/log/jobs')
-        shutil.move(job, 'S:/log/jobs/' + basename(job))
+        shutil.move(job, 'S:/log/jobs/' + path.basename(job))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     Main()
