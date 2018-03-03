@@ -52,10 +52,10 @@ class Main:
         logging.info('Job %s - removed, total jobs %s', path.basename(event.src_path), str(self.total_jobs))
 
     def check_jobs(self):
-        jobs = filter(os.path.isfile, glob('S:/jobs/*'))
+        jobs = filter(path.isfile, glob('S:/jobs/*'))
         for job in jobs:
             data = json.load(open(job, 'r'))
-            if os.path.isfile(data['movie']):
+            if path.isfile(data['movie']):
                 try:
                     logging.info('Job %s - movie exist', path.basename(job))
 
