@@ -18,7 +18,7 @@ class Main:
         self.shotgun = shotgun_api3.Shotgun('https://juicewro.shotgunstudio.com',
                                             'job-version-daemon',
                                             '3819096b36111394a58a2d7280059e1951eafcaba663b53ba2fe546cd3cab6f7')
-        self.jobs_count = 10
+        self.total_jobs = 10
 
         logging.basicConfig(
             filename='S:/log/job-version.log',
@@ -41,15 +41,15 @@ class Main:
             observer.stop()
 
     def on_created_job(self, event):
-        self.jobs_count = len(filter(os.path.isfile, glob.glob('S:/jobs/*')))
+        self.total_jobs = len(filter(os.path.isfile, glob.glob('S:/jobs/*')))
         self.check_jobs()
 
-        logging.info('Job %s - created, total jobs %s', basename(event.src_path), str(self.jobs_count))
+        logging.info('Job %s - created, total jobs %s', basename(event.src_path), str(self.total_jobs))
 
     def on_deleted_job(self, event):
-        self.jobs_count = len(filter(os.path.isfile, glob.glob('S:/jobs/*')))
+        self.total_jobs = len(filter(os.path.isfile, glob.glob('S:/jobs/*')))
 
-        logging.info('Job %s - removed, total jobs %s', basename(event.src_path), str(self.jobs_count))
+        logging.info('Job %s - removed, total jobs %s', basename(event.src_path), str(self.total_jobs))
 
     def check_jobs(self):
         jobs = filter(os.path.isfile, glob.glob('S:/jobs/*'))
