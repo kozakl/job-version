@@ -29,6 +29,7 @@ class Main:
 
         job_event_handler = JobEventHandler()
         job_event_handler.on_created = self.on_created_job
+        job_event_handler.on_deleted = self.on_deleted_job
         observer = Observer()
         observer.schedule(job_event_handler, 'S:/jobs')
         observer.start()
@@ -40,9 +41,15 @@ class Main:
             observer.stop()
 
     def on_created_job(self, event):
-        self.jobs_count += 1
-        logging.info('Job %s - created' + str(self.jobs_count), basename(event.src_path))
+        self.jobs_count = len(filter(os.path.isfile, glob.glob('S:/jobs/*')))
         self.check_jobs()
+
+        logging.info('Job %s - created, total jobs %s', basename(event.src_path), str(self.jobs_count))
+
+    def on_deleted_job(self, event):
+        self.jobs_count = len(filter(os.path.isfile, glob.glob('S:/jobs/*')))
+
+        logging.info('Job %s - removed, total jobs %s', basename(event.src_path), str(self.jobs_count))
 
     def check_jobs(self):
         jobs = filter(os.path.isfile, glob.glob('S:/jobs/*'))
