@@ -3,6 +3,7 @@ import json
 import time
 import glob
 import os
+import shutil
 import sys
 import os.path
 import logging
@@ -64,10 +65,16 @@ class Main:
                     entity = ShotgunUtil.upload_version(self.shotgun, version)
                     logging.info('Job %s - entity %s uploaded', basename(job), entity)
 
-                    os.remove(job)
-                    logging.info('Job %s - removed', basename(job))
+                    self.move_to_log(job)
+                    logging.info('Job %s - move to logs', basename(job))
                 except Exception as exception:
                     print(exception)
+
+    @staticmethod
+    def move_to_log(job):
+        if not os.path.exists('S:/log/jobs'):
+            os.makedirs('S:/log/jobs')
+        shutil.move(job, 'S:/log/jobs/' + basename(job))
 
 
 if __name__ == "__main__":
