@@ -18,7 +18,7 @@ class Main:
         self.shotgun = shotgun_api3.Shotgun('https://juicewro.shotgunstudio.com',
                                             'job-version-daemon',
                                             '3819096b36111394a58a2d7280059e1951eafcaba663b53ba2fe546cd3cab6f7')
-        self.total_jobs = 10
+        self.total_jobs = 0
 
         logging.basicConfig(
             filename='S:/log/job-version.log',
