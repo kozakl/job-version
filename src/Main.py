@@ -19,7 +19,7 @@ class Main:
         self.shotgun = shotgun_api3.Shotgun('https://juicewro.shotgunstudio.com',
                                             'job-version-daemon',
                                             '3819096b36111394a58a2d7280059e1951eafcaba663b53ba2fe546cd3cab6f7')
-        self.total_jobs = len(filter(path.isfile, glob('S:/jobs/*')))
+        self.total_jobs = self.get_total_jobs()
 
         logging.basicConfig(
             filename='S:/log/job-version.log',
@@ -44,11 +44,11 @@ class Main:
             observer.stop()
 
     def on_created_job(self, event):
-        self.total_jobs = len(filter(path.isfile, glob('S:/jobs/*')))
+        self.total_jobs = self.get_total_jobs()
         logging.info('Job %s - created, total jobs %s', path.basename(event.src_path), str(self.total_jobs))
 
     def on_deleted_job(self, event):
-        self.total_jobs = len(filter(path.isfile, glob('S:/jobs/*')))
+        self.total_jobs = self.get_total_jobs()
         logging.info('Job %s - removed, total jobs %s', path.basename(event.src_path), str(self.total_jobs))
 
     def check_jobs(self):
@@ -69,6 +69,10 @@ class Main:
                     logging.info('Job %s - move to logs', path.basename(job))
                 except Exception as exception:
                     print(exception)
+
+    @staticmethod
+    def get_total_jobs():
+        return len(filter(path.isfile, glob('S:/jobs/*')))
 
     @staticmethod
     def move_to_log(job):
