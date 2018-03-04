@@ -1,4 +1,4 @@
-from os.path import basename
+from os import path
 
 
 class ShotgunUtil:
@@ -9,7 +9,7 @@ class ShotgunUtil:
     @staticmethod
     def create_version(shotgun, job_data):
         data = {
-            'code': basename(job_data['movie']),
+            'code': path.basename(job_data['movie']),
             'project': {
                 'type': 'Project',
                 'id': job_data['projectId']
