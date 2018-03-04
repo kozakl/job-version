@@ -5,7 +5,6 @@ import os
 import time
 import shotgun_api3
 
-from datetime import datetime
 from glob import glob
 from os import path
 from watchdog.observers import Observer
@@ -56,9 +55,7 @@ class Main:
         jobs = filter(path.isfile, glob('S:/jobs/*'))
         for job in jobs:
             data = json.load(open(job, 'r'))
-            job_date = datetime.strptime(data['date'], '%Y-%m-%d %H:%M')
-            job_hours = divmod((datetime.now() - job_date).total_seconds(), 3600)[0]
-            if job_hours > 5:
+            if JobUtil.is_expired(data, 5):
                 JobUtil.move_to_log(job)
                 logging.info('Job %s - expired and move to logs', path.basename(job))
             elif path.isfile(data['movie']):

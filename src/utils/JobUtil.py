@@ -1,6 +1,7 @@
 import shutil
 import os
 
+from datetime import datetime
 from glob import glob
 from os import path
 
@@ -19,3 +20,9 @@ class JobUtil:
         if not path.exists('S:/log/jobs'):
             os.makedirs('S:/log/jobs')
         shutil.move(job, 'S:/log/jobs/' + path.basename(job))
+
+    @staticmethod
+    def is_expired(job_data, hours):
+        date = datetime.strptime(job_data['date'], '%Y-%m-%d %H:%M')
+        diff = datetime.now() - date
+        return divmod(diff.seconds, 3600)[0] > hours
