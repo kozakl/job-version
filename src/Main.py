@@ -56,10 +56,9 @@ class Main:
         jobs = filter(path.isfile, glob('S:/jobs/*'))
         for job in jobs:
             data = json.load(open(job, 'r'))
-            date = datetime.strptime(data['date'], '%Y-%m-%d %H:%M')
-            cu = (datetime.now() - date).total_seconds()
-            h = divmod(cu, 3600)[0]
-            if h > 5:
+            job_date = datetime.strptime(data['date'], '%Y-%m-%d %H:%M')
+            job_hours = divmod((datetime.now() - job_date).total_seconds(), 3600)[0]
+            if job_hours > 5:
                 self.move_to_log(job)
                 logging.info('Job %s - expired and move to logs', path.basename(job))
             elif path.isfile(data['movie']):
