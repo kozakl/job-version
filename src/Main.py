@@ -76,4 +76,5 @@ class Main:
 
 if __name__ == '__main__':
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+    sys.stderr = open('S:/log/job-version-err.log', 'w')
     Main()
