@@ -23,7 +23,7 @@ class Main:
 
         logging.basicConfig(
             filename='S:/log/job-version.log',
-            format='%(asctime)s %(levelname)-6s %(message)s',
+            format='%(asctime)s %(levelname)-5s %(message)s',
             datefmt='%Y-%m-%d %H:%M:%S',
             level=logging.DEBUG
         )
