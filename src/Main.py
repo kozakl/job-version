@@ -59,9 +59,8 @@ class Main:
                 JobUtil.move_to_log(job)
                 logging.info('Job %s - expired and move to logs', path.basename(job))
             elif path.isfile(data['movie']):
+                logging.info('Job %s - movie exist', path.basename(job))
                 try:
-                    logging.info('Job %s - movie exist', path.basename(job))
-
                     version = ShotgunUtil.create_version(self.shotgun, data)
                     logging.info('Job %s - version %s created', path.basename(job), version['id'])
 
@@ -71,7 +70,7 @@ class Main:
                     JobUtil.move_to_log(job)
                     logging.info('Job %s - complete and move to logs', path.basename(job))
                 except Exception as exception:
-                    print(exception)
+                    logging.error(exception)
 
 
 if __name__ == '__main__':
