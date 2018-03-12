@@ -25,4 +25,4 @@ class JobUtil:
     def is_expired(job_data, hours):
         date = datetime.strptime(job_data['date'], '%Y-%m-%d %H:%M')
         diff = datetime.now() - date
-        return divmod(diff.seconds, 3600)[0] > hours
+        return divmod(diff.total_seconds(), 3600)[0] > hours
