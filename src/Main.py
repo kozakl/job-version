@@ -39,7 +39,7 @@ class Main:
             while True:
                 if self.total_jobs > 0:
                     self.check_jobs()
-                time.sleep(10)
+                time.sleep(60)
         except KeyboardInterrupt:
             observer.stop()
 
