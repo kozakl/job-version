@@ -47,6 +47,11 @@ class Main:
         self.total_jobs = JobUtil.get_total_jobs()
         logging.info('Job %s - created, total jobs %s', path.basename(event.src_path), str(self.total_jobs))
 
+        data = json.load(open(event.src_path, 'r'))
+        if path.isfile(data['movie']):
+            os.remove(data['movie'])
+            logging.info('Job %s - remove cached movie', path.basename(event.src_path))
+
     def on_deleted_job(self, event):
         self.total_jobs = JobUtil.get_total_jobs()
         logging.info('Job %s - removed, total jobs %s', path.basename(event.src_path), str(self.total_jobs))
