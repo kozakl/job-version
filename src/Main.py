@@ -48,7 +48,7 @@ class Main:
         logging.info('Job %s - created, total jobs %s', path.basename(event.src_path), str(self.total_jobs))
 
         data = json.load(open(event.src_path, 'r'))
-        if path.isfile(data['movie']):
+        if path.isfile(data['movie']) and (time.time() - path.getctime(data['movie'])) / 60 > 1:
             os.remove(data['movie'])
             logging.info('Job %s - remove cached movie', path.basename(event.src_path))
 
