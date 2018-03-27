@@ -65,6 +65,15 @@ class Main:
                 logging.info('Job %s - expired and move to logs', path.basename(job))
             elif path.isfile(data['movie']):
                 logging.info('Job %s - movie exist', path.basename(job))
+                if 'shotgun_h264' in data['movie']:
+                    new_movie = data['movie'].replace('shotgun_h264', data['outputName'])
+                    if path.isfile(new_movie):
+                        os.rename(new_movie, new_movie + '___')
+                    os.rename(data['movie'], new_movie)
+
+                    logging.info('Job %s - movie rename %s to %s', path.basename(job), data['movie'], new_movie)
+                    data['movie'] = new_movie
+
                 try:
                     version = ShotgunUtil.create_version(self.shotgun, data)
                     logging.info('Job %s - version %s created', path.basename(job), version['id'])
