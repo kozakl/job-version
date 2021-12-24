@@ -6,4 +6,4 @@ venv/
 
 # Others
 .idea/
-TODO.txt
+.DS_Store
